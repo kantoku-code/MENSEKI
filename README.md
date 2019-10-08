@@ -20,10 +20,10 @@ https://knowledge.autodesk.com/ja/support/fusion-360/troubleshooting/caas/sfdcar
 + Windows10 64bit Pro
 
 ## 例
-+ダイアログ
++ ダイアログ
 
-![ダイアログ](https://github.com/kantoku-code/MENSEKI.git/images/Dialog.png "ダイアログ")
+![ダイアログ](./images/Dialog.png)
 
-+ツールチップ
++ ツールチップ
 
-![ツールチップ](https://github.com/kantoku-code/MENSEKI.git/images/Tooltip.png "ツールチップ")
+![ツールチップ](./images/Tooltip.png)
