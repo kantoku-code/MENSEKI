@@ -11,6 +11,7 @@ from .Fusion360Utilities.Fusion360CommandBase import Fusion360CommandBase
 from .Fusion360Utilities.Fusion360Utilities import AppObjects
 from .total_area import total_area
 from .total_volume import total_volume
+from .total_length import total_length
 
 commands = []
 command_definitions = []
@@ -19,6 +20,18 @@ command_definitions = []
 debug = False
 
 def run(context):
+
+    # 長さ
+    cmd = {
+        'cmd_name': '長さ',
+        'cmd_description': '選択されたエッジの合計長さ',
+        'cmd_id': 'total_length_id',
+        'cmd_resources': './resources/total_length',
+        'workspace': 'FusionSolidEnvironment',
+        'toolbar_panel_id': 'InspectPanel',
+        'class': total_length
+    }
+    command_definitions.append(cmd)
 
     # 面積
     cmd = {
