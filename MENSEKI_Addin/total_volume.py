@@ -7,9 +7,11 @@ from .Fusion360Utilities.Fusion360Utilities import AppObjects
 from .Fusion360Utilities.Fusion360CommandBase import Fusion360CommandBase
 
 _selInfo = ['dlgSel','ボディの選択','-']
-_txtInfo = ['dlgtxt','合計体積','-']
+_txtVolInfo = ['dlgtxt','合計体積','-']
+_txtCogInfo = ['dlgCogtxt','重心','-']
 
-_covunit = 0.0
+_covunitVol = 0.0
+_covunitLng = 0.0
 _defLenUnit = ''
 
 class total_volume(Fusion360CommandBase):
@@ -31,16 +33,31 @@ class total_volume(Fusion360CommandBase):
         for idx in range(selIpt.selectionCount):
             volume += selIpt.selection(idx).entity.physicalProperties.volume
 
-        global _covunit, _defLenUnit
-        volume = volume * _covunit
+        global _covunitVol, _defLenUnit
+        volume = volume * _covunitVol
         volume_txt = '{:.3e}　{}^3\n{}　{}^3'.format(volume, _defLenUnit, volume, _defLenUnit)
 
         selIpt.commandPrompt = '{0}　個合計\n'.format(selIpt.selectionCount) + volume_txt
 
+        if selIpt.selectionCount == 1:
+            cog = selIpt.selection(0).entity.physicalProperties.centerOfMass
+            cogX = cog.x * _covunitLng
+            cogY = cog.y * _covunitLng
+            cogZ = cog.z * _covunitLng
+            cog_txt = 'X{:.3e} {} Y{:.3e} {} Z{:.3e} {} \nX{} {} Y{} {} Z{} {}'.format(
+                cogX, _defLenUnit, cogY, _defLenUnit, cogZ, _defLenUnit,
+                cogX, _defLenUnit, cogY, _defLenUnit, cogZ, _defLenUnit)
+        else:
+            cog_txt = '-'
+
         # Text Input
-        global _txtInfo
-        txtIpt :adsk.core.TextBoxCommandInput = inputs.itemById(_txtInfo[0])
-        txtIpt.text = volume_txt
+        global _txtVolInfo
+        txtVolIpt :adsk.core.TextBoxCommandInput = inputs.itemById(_txtVolInfo[0])
+        txtVolIpt.text = volume_txt
+
+        global _txtCogInfo
+        txtCogIpt :adsk.core.TextBoxCommandInput = inputs.itemById(_txtCogInfo[0])
+        txtCogIpt.text = cog_txt
 
     def on_create(
         self,
@@ -48,12 +65,13 @@ class total_volume(Fusion360CommandBase):
         inputs: adsk.core.CommandInputs):
 
         # unit
-        global _defLenUnit, _covunit
+        global _defLenUnit, _covunitVol, _covunitLng
         ao = AppObjects()
         unitsMgr = ao.units_manager
         _defLenUnit = unitsMgr.defaultLengthUnits
         tmp = unitsMgr.convert(1, unitsMgr.internalUnits, _defLenUnit)
-        _covunit = tmp * tmp * tmp
+        _covunitVol = tmp * tmp * tmp
+        _covunitLng = tmp
 
         # command
         command.isOKButtonVisible = False
@@ -65,6 +83,10 @@ class total_volume(Fusion360CommandBase):
         selIpt.addSelectionFilter('Bodies')
         selIpt.commandPrompt = _selInfo[1]
 
-        global _txtInfo
+        global _txtVolInfo
         inputs.addTextBoxCommandInput(
-            _txtInfo[0], _txtInfo[1], _txtInfo[2], 2, True)
+            _txtVolInfo[0], _txtVolInfo[1], _txtVolInfo[2], 2, True)
+
+        global _txtCogInfo
+        inputs.addTextBoxCommandInput(
+            _txtCogInfo[0], _txtCogInfo[1], _txtCogInfo[2], 6, True)
